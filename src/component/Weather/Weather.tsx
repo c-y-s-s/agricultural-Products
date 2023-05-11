@@ -102,7 +102,7 @@ const Weather = () => {
 
   const weatherTotalData = useGetWeatherDataQuery({
     cityName: "臺北市",
-    Date: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+    Date: dayjs().format("YYYY-MM-DDTHH"),
   });
 
   const [weatherData, setWeatherData] = useState<any>();

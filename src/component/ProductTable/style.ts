@@ -5,7 +5,9 @@ export const TableContainer = styled.div<any>`
   .agricultural-products-table {
     padding: 0px 20px 20px 20px;
     overflow: hidden auto;
-    height: calc(100vh - 109px);
+
+    height: ${(props) =>
+      props.renderType === "chart" ? "100%" : "calc(100vh - 109px)"};
     @media ${device.tablet} {
       text-align: center;
     }

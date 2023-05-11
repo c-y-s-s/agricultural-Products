@@ -128,7 +128,7 @@ const AgriculturalProducts = () => {
         return { ...nowDataItem, priceDifference: filterResultAvgPrice[0] };
       }
     );
-    console.log(resultAgriculturalData);
+
     return resultAgriculturalData;
   };
   // 搜尋邏輯
@@ -180,74 +180,79 @@ const AgriculturalProducts = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [AgriculturalTotalData, beforeDate, selectData]);
 
+  useEffect(() => {
+    console.log(AgriculturalTotalData);
+  }, [AgriculturalTotalData]);
   return (
     <Styles.AgriculturalProductsContainer>
-      {AgriculturalTotalData.isLoading ? (
-        <div className="loading-container">
-          <ReactLoading
-            type={"spin"}
-            color="#478058"
-            height={"80px"}
-            width={"80px"}
-            className={"loading"}
-          />
-          <div>資料快好了...</div>
-        </div>
-      ) : (
-        <>
-          <div className="agricultural-products-title">
-            <div className="primary-title">
-              農產品資訊
-              <div className="primary-title-select-date">
-                <SelectDate
-                  setBeforeDate={setBeforeDate}
-                  setSelectData={setSelectData}
-                />
-              </div>
+      <>
+        <div className="agricultural-products-title">
+          <div className="primary-title">
+            農產品資訊
+            <div className="primary-title-select-date">
+              <SelectDate
+                setBeforeDate={setBeforeDate}
+                setSelectData={setSelectData}
+              />
             </div>
-            <div className="right-block">
-              <div className="right-block-select-date">
-                <SelectDate
-                  setBeforeDate={setBeforeDate}
-                  setSelectData={setSelectData}
-                />
-              </div>
+          </div>
+          <div className="right-block">
+            <div className="right-block-select-date">
+              <SelectDate
+                setBeforeDate={setBeforeDate}
+                setSelectData={setSelectData}
+              />
+            </div>
 
-              <div className="market-name">
-                <div>市場名稱</div>
-                <div>
-                  <Select
-                    defaultValue={options[1]}
-                    options={options}
-                    className="market-select"
-                    onChange={(option: SelectMarketNameType | null): void => {
-                      if (option) setSelectMarketName(option);
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="search">
-                <div className="search-button">搜尋農產品</div>
-                <input
-                  type="text"
-                  value={searchText}
-                  onChange={(e) => {
-                    setSearchText(e.target.value);
-                    handleProductSearch(e.target.value);
+            <div className="market-name">
+              <div>市場名稱</div>
+              <div>
+                <Select
+                  defaultValue={options[1]}
+                  options={options}
+                  className="market-select"
+                  onChange={(option: SelectMarketNameType | null): void => {
+                    if (option) setSelectMarketName(option);
                   }}
                 />
               </div>
             </div>
+
+            <div className="search">
+              <div className="search-button">搜尋農產品</div>
+              <input
+                type="text"
+                value={searchText}
+                onChange={(e) => {
+                  setSearchText(e.target.value);
+                  handleProductSearch(e.target.value);
+                }}
+              />
+            </div>
           </div>
+        </div>
+
+        {AgriculturalTotalData.isLoading ? (
+          <div className="loading-container">
+            <ReactLoading
+              type={"spin"}
+              color="#478058"
+              height={"80px"}
+              width={"80px"}
+              className={"loading"}
+            />
+            <div>資料快好了...</div>
+          </div>
+        ) : (
           <ProductTable
+            status={AgriculturalTotalData.status}
             productTitleData={productTitleData}
             ProductData={agriculturalData}
             renderType={"table"}
             selectData={selectData}
           />
-        </>
-      )}
+        )}
+      </>
     </Styles.AgriculturalProductsContainer>
   );
 };

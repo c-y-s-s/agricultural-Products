@@ -3,6 +3,7 @@ import { Chart as ChartJS, registerables } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { useGetReservoirDataQuery } from "../api/reservoirApi";
 import styled from "styled-components";
+import dayjs from "dayjs";
 ChartJS.register(...registerables);
 
 interface ChartDatasetsType {
@@ -21,8 +22,8 @@ interface ChartDataType {
 const LineContainer = styled.div``;
 function ReservoirChart() {
   // 石門水庫 API
-  const reservoirTotalData = useGetReservoirDataQuery();
-  const reservoirData = reservoirTotalData.data;
+  const { data: reservoirData } = useGetReservoirDataQuery();
+  // const reservoirData = reservoirTotalData.data;
 
   const [labels, setLabels] = useState<string[]>([]);
   const [chartDatasets, setChartDatasets] = useState<ChartDatasetsType[]>([]);
@@ -41,6 +42,7 @@ function ReservoirChart() {
       const dataCategory = reservoirData?.responseData?.reduce(
         (acc, cur): any => {
           acc[cur?.MonitorLocation] = acc[cur?.MonitorLocation] || [];
+
           acc[cur?.MonitorLocation].push(cur);
           return acc;
         },
@@ -49,7 +51,9 @@ function ReservoirChart() {
 
       if (dataCategory) {
         // 根據分類的 object key 重組成 chart 需要的資料格式
+
         const datasetsResult = Object?.keys(dataCategory)?.map((item) => {
+          
           const turbidityResult = dataCategory[item]?.map((item: any) => {
             return item.Turbidity;
           });
@@ -68,9 +72,10 @@ function ReservoirChart() {
             borderColor,
             fill: false,
             cubicInterpolationMode: "monotone",
-            tension: 0.7,
+            tension: 1.5,
           };
         });
+
         if (datasetsResult) setChartDatasets(datasetsResult);
       }
     }
@@ -81,18 +86,10 @@ function ReservoirChart() {
     if (reservoirData) {
       // label 需要呈現的時間格式
       const labelsData = reservoirData?.responseData?.reduce((acc, cur) => {
-        const hour =
-          new Date(cur?.MonitorDate).getHours() < 10
-            ? new Date(cur?.MonitorDate).getHours() + "0"
-            : new Date(cur?.MonitorDate).getHours();
-        const minute =
-          new Date(cur?.MonitorDate).getMinutes() < 10
-            ? new Date(cur?.MonitorDate).getMinutes() + "0"
-            : new Date(cur?.MonitorDate).getMinutes();
-        const seconds =
-          new Date(cur?.MonitorDate).getSeconds() < 10
-            ? new Date(cur?.MonitorDate).getSeconds() + "0"
-            : new Date(cur?.MonitorDate).getSeconds();
+        const hour = dayjs(cur?.MonitorDate).format("HH");
+        const minute = dayjs(cur?.MonitorDate).format("mm");
+        const seconds = dayjs(cur?.MonitorDate).format("ss");
+
         if (acc.includes(`${hour}:${minute}:${seconds}`)) {
         } else {
           acc.push(`${hour}:${minute}:${seconds}`);
@@ -119,7 +116,7 @@ function ReservoirChart() {
           position: "top",
         },
         title: {
-          display: true,
+          display: false,
           text: "石門水庫混濁度",
         },
       },
