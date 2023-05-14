@@ -11,6 +11,7 @@ import * as Styles from "./style";
 const SelectDate: FC<any> = ({ setBeforeDate, setSelectData }) => {
   const dispatch = useDispatch();
   const dateData: Dayjs = dayjs();
+  console.log(setBeforeDate, setSelectData);
   return (
     <Styles.SelectDateContainer className="select-date">
       <LocalizationProvider dateAdapter={AdapterDayjs}>

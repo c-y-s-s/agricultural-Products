@@ -1,7 +1,7 @@
 import { useGetAgriculturalDataQuery } from "../../api/agriculturalProductsApi";
 import Select from "react-select";
 
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import * as Styles from "./style";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -29,7 +29,7 @@ interface ResultAgriculturalTotalData {
   priceDifference?: string;
 }
 
-const AgriculturalProducts = () => {
+const AgriculturalProducts: FC<any> = () => {
   const dispatch = useDispatch();
   const dateData: Dayjs = dayjs();
   //  market label data
@@ -134,7 +134,6 @@ const AgriculturalProducts = () => {
   // 搜尋邏輯
   const handleProductSearch = (text: string) => {
     // 比對搜尋欄的字與 api 比對
-
     const resultAgriculturalData = spreadPercentage();
 
     const searchData = resultAgriculturalData?.filter(
@@ -149,13 +148,11 @@ const AgriculturalProducts = () => {
   // 初次渲染當天,後續交由 select 選的日期渲染
   useEffect(() => {
     // 判斷現在時間是否是早上7點,如果超過7點就用當天日期打api 如果不是就前一天
-
     const now: any =
       dateData?.hour() >= 7 ? dateData : dateData.subtract(1, "day");
-    const year = now.$y - 1911;
-    const month = now.$M + 1 < 10 ? "0" + (now.$M + 1) : now.$M + 1;
-    const day = now.$D < 10 ? "0" + now.$D : now.$D;
-
+    const year = now.year() - 1911;
+    const month = now.format("MM");
+    const day = now.format("DD");
     dispatch(setDate(`${year + 1911}/${month}/${day}`));
     setSelectData(`${year}.${month}.${day}`);
 
@@ -163,11 +160,9 @@ const AgriculturalProducts = () => {
       dateData?.hour() >= 7
         ? dayjs(dateData).subtract(1, "day")
         : dayjs(dateData).subtract(2, "day");
-    const beforeOneYear: any = beforeDate && beforeDate?.$y - 1911;
-    const beforeOneMonth =
-      beforeDate.$M + 1 < 10 ? "0" + (beforeDate.$M + 1) : beforeDate.$M + 1;
-    const beforeOneDay =
-      beforeDate.$D < 10 ? "0" + beforeDate.$D : beforeDate.$D;
+    const beforeOneYear: any = beforeDate.year() - 1911;
+    const beforeOneMonth = beforeDate.format("MM");
+    const beforeOneDay = beforeDate.format("DD");
 
     setBeforeDate(`${beforeOneYear}.${beforeOneMonth}.${beforeOneDay}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -180,79 +175,87 @@ const AgriculturalProducts = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [AgriculturalTotalData, beforeDate, selectData]);
 
-  useEffect(() => {
-    console.log(AgriculturalTotalData);
-  }, [AgriculturalTotalData]);
-  return (
-    <Styles.AgriculturalProductsContainer>
-      <>
-        <div className="agricultural-products-title">
-          <div className="primary-title">
-            農產品資訊
-            <div className="primary-title-select-date">
-              <SelectDate
-                setBeforeDate={setBeforeDate}
-                setSelectData={setSelectData}
+  function AgriculturalProductsJSX() {
+    switch (AgriculturalTotalData.isLoading) {
+      case true:
+        return (
+          <>
+            <div className="loading-container">
+              <ReactLoading
+                type={"spin"}
+                color="#478058"
+                height={"80px"}
+                width={"80px"}
+                className={"loading"}
               />
+              <div>資料快好了...</div>
             </div>
-          </div>
-          <div className="right-block">
-            <div className="right-block-select-date">
-              <SelectDate
-                setBeforeDate={setBeforeDate}
-                setSelectData={setSelectData}
-              />
-            </div>
+          </>
+        );
+      case false:
+        return (
+          <>
+            <div className="agricultural-products-title">
+              <div className="primary-title">
+                農產品資訊
+                <div className="primary-title-select-date">
+                  <SelectDate
+                    setBeforeDate={setBeforeDate}
+                    setSelectData={setSelectData}
+                  />
+                </div>
+              </div>
+              <div className="right-block">
+                <div className="right-block-select-date">
+                  <SelectDate
+                    setBeforeDate={setBeforeDate}
+                    setSelectData={setSelectData}
+                  />
+                </div>
 
-            <div className="market-name">
-              <div>市場名稱</div>
-              <div>
-                <Select
-                  defaultValue={options[1]}
-                  options={options}
-                  className="market-select"
-                  onChange={(option: SelectMarketNameType | null): void => {
-                    if (option) setSelectMarketName(option);
-                  }}
-                />
+                <div className="market-name">
+                  <div>市場名稱</div>
+                  <div>
+                    <Select
+                      defaultValue={options[1]}
+                      options={options}
+                      className="market-select"
+                      onChange={(option: SelectMarketNameType | null): void => {
+                        if (option) setSelectMarketName(option);
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="search">
+                  <div className="search-button">搜尋農產品</div>
+                  <input
+                    type="text"
+                    value={searchText}
+                    onChange={(e) => {
+                      setSearchText(e.target.value);
+                      handleProductSearch(e.target.value);
+                    }}
+                  />
+                </div>
               </div>
             </div>
-
-            <div className="search">
-              <div className="search-button">搜尋農產品</div>
-              <input
-                type="text"
-                value={searchText}
-                onChange={(e) => {
-                  setSearchText(e.target.value);
-                  handleProductSearch(e.target.value);
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {AgriculturalTotalData.isLoading ? (
-          <div className="loading-container">
-            <ReactLoading
-              type={"spin"}
-              color="#478058"
-              height={"80px"}
-              width={"80px"}
-              className={"loading"}
+            <ProductTable
+              status={AgriculturalTotalData.status}
+              productTitleData={productTitleData}
+              ProductData={agriculturalData}
+              renderType={"table"}
+              selectData={selectData}
             />
-            <div>資料快好了...</div>
-          </div>
-        ) : (
-          <ProductTable
-            status={AgriculturalTotalData.status}
-            productTitleData={productTitleData}
-            ProductData={agriculturalData}
-            renderType={"table"}
-            selectData={selectData}
-          />
-        )}
-      </>
+          </>
+        );
+      default:
+        break;
+    }
+  }
+  return (
+    <Styles.AgriculturalProductsContainer>
+      {AgriculturalProductsJSX()}
     </Styles.AgriculturalProductsContainer>
   );
 };

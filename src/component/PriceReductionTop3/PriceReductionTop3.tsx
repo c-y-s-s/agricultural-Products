@@ -106,8 +106,8 @@ const PriceReductionTop3Container = styled.div`
 `;
 const PriceReductionTop3 = () => {
   const agriculturalTotalData: any = useGetAgriculturalDataQuery({
-    startTime: "112.05.09",
-    endTime: "112.05.09",
+    startTime: "112.05.14",
+    endTime: "112.05.14",
     marketName: "台北二",
   });
   const [agriculturalData, setAgriculturalData] = useState<any>("");
