@@ -12,7 +12,7 @@ import ReactLoading from "react-loading";
 const ProductTable: FC<any> = ({
   productTitleData,
   ProductData,
-  renderType,
+  renderType, 
   selectData,
   status,
 }) => {
@@ -42,7 +42,7 @@ const ProductTable: FC<any> = ({
                   ? "0%"
                   : item.priceDifference + "%"}
               </div>
-              <div
+              <div 
                 className="go-chart"
                 onClick={() => {
                   dispatch(setComponentToggle("chart"));
